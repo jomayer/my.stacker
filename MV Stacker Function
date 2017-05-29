@@ -1,4 +1,4 @@
-
+<code>
 
 MV.Stacker <- function(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 require(caret)
@@ -147,3 +147,4 @@ weighted.fits[[i]] <- weights[i] * my.test.fits[[i]]
 weighted.sum.fits <- Reduce('+', weighted.fits)
 return(list(preds = weighted.sum.fits, coef = weights))
 }
+</code>
