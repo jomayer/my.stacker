@@ -1,4 +1,4 @@
-# Mt.Stacker
+# MV Stacker
 <h1> A multivariate Stacking Algorithm </h1>
 
 <b> Date: </b> 5/29/2017
@@ -16,26 +16,25 @@
 <h2> Usage </h2>
 
 <code>
-my.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
+MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 </code>
 
 <b> Inputs </b>
 
 <strong> fit.mods: </strong> A list of functions to be stacked. The functions must be of the form <code> fun(dat, vars) </code> and the output of those functions must be test predictions.
 
-<strong> dat: </strong> A list of dataframes consisting of an entry in the list labeled <it> test </it> and <it> train </it>
+<strong> dat: </strong> A list of dataframes consisting of an entry in the list labeled <i> test </i> and <i> train </i>
 
-<strong> vars: </strong> 
+<strong> vars: </strong> A list of additional arguments for fit.mods
 
-<strong> mtry: </strong> An integer greater than or equal to 1. The number of variables sampled for each tree.
+<strong> covar: </strong> An optional list of covariance matricies of <code> length </code> equal to <code>nrow(dat$train) </code>  to use in the stacking algorithm. The default is to use <code> cov(dat$train) </code>
 
-<strong> alpha: </strong> An number between 0 and 1. The significance level declared for feature removal.
+<strong> nfold: </strong> The number of folds used in stacking. The default is 5.
 
-<strong> prop.test: </strong> A number between 0 and 1. The size of the test set for the secondary test, as a proportion of the data. Default is 0.632.
+<strong> response.position: </strong> A vector of integers detailing which columns the response is located in the dataframe.
 
-<strong> response.position: </strong>  The column of which the responses are located. It could be done automatically with the Formula package, but this breaks down in high dimensions.
 
-<h2> Details </h2> The following is the function to run the Sequential Multi Response Feature Selection (SMURFS). The function selects a subset of features of size <emph> mtry </emph> and a bootstrap sample of size <emph> n </emph>, grows a tree from those features and that bootstrap sample using the conditional inference framework (Hothornet <i> et al. </i>, 2006), then selects the features that are significant at any node of the tree. Features that are not selected are tested on a test set that is a subset of the data. Features that fail the second test are removed from consideration. After <i> ntree </i> iterations the features that survive are the selected features.
+<h2> Details </h2> The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is <math> &sum;_{i=1}^n w;_i f;_i(x) </math>
 
 <h2> Value </h2> A list of survived covariates.
 
@@ -43,6 +42,8 @@ my.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 
     library(MASS)
     library(Matrix)
+    library(partykit)
+    library(glmnet)
     set.seed(100)
     beta <- c(runif(50,1,3), rep(0,950))  
     sigma.y <- matrix(c(1,0.7,0.7,0.7,1,0.7,0.7,0.7,1), nrow = 3,  byrow = F)
