@@ -1,14 +1,13 @@
 # MV Stacker
-<h1> A multivariate Stacking Algorithm </h1>
-<head>
-<title>MathJax TeX Test Page</title>
 <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
 </script>
-<script type="text/javascript" async
-  src="https://example.com/MathJax.js?config=TeX-AMS_CHTML">
-</script>
-</head>
+<script type="text/javascript" async src="path-to-mathjax/MathJax.js?config=TeX-AMS_CHTML"></script>
+
+
+<h1> A multivariate Stacking Algorithm </h1>
 
 <b> Date: </b> 5/29/2017
 
@@ -43,7 +42,7 @@ MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 <strong> response.position: </strong> A vector of integers detailing which columns the response is located in the dataframe.
 
 
-<h2> Details </h2> The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is $ \sum_{i=1}^n w_i f_i(x) $
+<h2> Details </h2> The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is $\sum_{i=1}^n w_i f_i(x)$
 
 <h2> Value </h2> A list of survived covariates.
 
