@@ -35,7 +35,15 @@ MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 <strong> response.position: </strong> A vector of integers detailing which columns the response is located in the dataframe.
 
 
-<h2> Details </h2> The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is $\sum_{i=1}^n w_i f_i(x)$. The $w_i$'s are obtained using 
+<h2> Details </h2> 
+
+<head>
+    <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+</head>
+
+The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is $\sum_{i=1}^n w_i f_i(x)$. The $w_i$'s are obtained using 
 
 $$\underset{\arg\min}{w\in[0,1]^m; \sum w_j = 1}\sum_{i=1}^n (y_i - \sum w_j \hat{f}_j^(x))^\top\Omega^{-1} (y_i - \sum w_j \hat{f}_j(x)) $$
 
