@@ -1,60 +1,5 @@
 
 # MV Stacker
-<script>
-(function () {
-  var newMathJax = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js';
-  var oldMathJax = 'cdn.mathjax.org/mathjax/latest/MathJax.js';
-
-  var replaceScript = function (script, src) {
-    //
-    //  Make redirected script
-    //
-    var newScript = document.createElement('script');
-    newScript.src = newMathJax + src.replace(/.*?(\?|$)/, '$1');
-    //
-    //  Move onload and onerror handlers to new script
-    //
-    newScript.onload = script.onload; 
-    newScript.onerror = script.onerror;
-    script.onload = script.onerror = null;
-    //
-    //  Move any content (old-style configuration scripts)
-    //
-    while (script.firstChild) newScript.appendChild(script.firstChild);
-    //
-    //  Copy script id
-    //
-    if (script.id != null) newScript.id = script.id;
-    //
-    //  Replace original script with new one
-    //
-    script.parentNode.replaceChild(newScript, script);
-    //
-    //  Issue a console warning
-    //
-    console.warn('WARNING: cdn.mathjax.org has been retired. Check https://www.mathjax.org/cdn-shutting-down/ for migration tips.')
-  }
-
-  if (document.currentScript) {
-    var script = document.currentScript;
-    replaceScript(script, script.src);
-  } else {
-    //
-    // Look for current script by searching for one with the right source
-    //
-    var n = oldMathJax.length;
-    var scripts = document.getElementsByTagName('script');
-    for (var i = 0; i < scripts.length; i++) {
-      var script = scripts[i];
-      var src = (script.src || '').replace(/.*?:\/\//,'');
-      if (src.substr(0, n) === oldMathJax) {
-        replaceScript(script, src);
-        break;
-      }
-    }
-  }
-})();
-</script>
 
 <h1> A multivariate Stacking Algorithm </h1>
 
@@ -95,9 +40,9 @@ MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 
 The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is $\sum_{i=1}^n w_i f_i(x)$. The $w_i$'s are obtained using 
 
-$$\underset{\arg\min}{w\in[0,1]^m; \sum w_j = 1}\sum_{i=1}^n (y_i - \sum w_j \hat{f}_j^(x))^\top\Omega^{-1} (y_i - \sum w_j \hat{f}_j(x)) $$
+$$\underset{\arg\min}{w\in[0,1]^m; \sum w_j = 1}\sum_{i=1}^n (y_i - \sum w_j \hat{f}_j^k(x))^\top\Omega^{-1} (y_i - \sum w_j \hat{f}_j^k(x)) $$
 
-Where each $\hat{f}_i(x)$ is the prediction obtained from from $k$th cross validated sample. The algorithm used in this case is downhill simplex, but BFGS is in production.
+Where each $\hat{f}_i^k(x)$ is the prediction obtained from from $k$th cross validated sample. The algorithm used in this case is downhill simplex, but BFGS is in production.
 
 <h2> Value </h2> A list containing the weights of each model and it's associated test predictions. 
 
@@ -105,27 +50,58 @@ Where each $\hat{f}_i(x)$ is the prediction obtained from from $k$th cross valid
 
     library(MASS)
     library(Matrix)
-    library(partykit)
+    library(party)
     library(glmnet)
+    #Create the data
     set.seed(100)
-    beta <- c(runif(50,1,3), rep(0,950))  
-    sigma.y <- matrix(c(1,0.7,0.7,0.7,1,0.7,0.7,0.7,1), nrow = 3,  byrow = F)
-    omega <- function(n)
-    {
-    my.mat <- matrix(0.7, n, n)
-    diag(my.mat) <- rep(1,n)
-    return(my.mat)
-    }
-    sigma.x <- bdiag(omega(50), diag(1,950))
+    beta <- c(runif(100,0,1))  
     set.seed(100)    
-    xx <- mvrnorm(200, rep(0,1000), sigma.x)
-    means <- xx %*% beta
+    xx.train <- mvrnorm(200, rep(0,100), diag(1, 100))
+    xx.test <- mvrnorm(200, rep(0,100), diag(1, 100))
+    means.train <- xx.train %*% beta + 25 * 1 / (1 + exp(-xx.train %*% beta))
+    means.test <- xx.test %*% beta + + 25 * 1 / (1 + exp(-xx.train %*% beta))
     set.seed(100)
-    yy <- t(sapply(1:200, function(i) mvrnorm(n=1, mu = rep(means[i,],3), Sigma = sigma.y)))
-    dat <- as.data.frame(cbind(xx,yy))
+    yy.train <- t(sapply(1:200, function(i) mvrnorm(n=1, mu = rep(means.train[i,],3), Sigma = diag(1,3))))
+    yy.test <- t(sapply(1:200, function(i) mvrnorm(n=1, mu = rep(means.test[i,],3), Sigma = diag(1,3))))   
+    dat.train <- as.data.frame(cbind(xx.train, yy.train))
+    dat.test <- as.data.frame(cbind(xx.test, yy.test))
+    dat <- list(train = dat.train, test = dat.test)
+    
+    ## create the functions
+    
+    
+    
+    my.enet <- function(dat, vars){
+    xx.train <- as.matrix(dat$train[, 1:100])
+    xx.test <- as.matrix(dat$test[, 1:100])
+    yy <- as.matrix(dat$train[, 101:103])
+    cvcv <- cv.glmnet(x = xx.train, y = yy, family = 'mgaussian',
+         alpha = vars$alpha, intercept = FALSE)
+    preds <- predict(cvcv, newx = xx.test, s = vars$lambda)[,,1]
+    return(preds)
+    }
+    
+    my.rf <- function(dat, vars){
+    my.forest <- cforest(vars$formula, 
+           data = dat$train,
+           control = cforest_unbiased(ntree = vars$ntree, mtry = vars$mtry ))
+    preds <- predict(my.forest, dat$test, OOB = T)
+    preds <- do.call(rbind, preds)
+    return(preds)
+     }
+
+
+
+    fit.mods <- list(my.enet, my.rf, my.enet)
+
+    vars <- list(
+    list(alpha = 0.2, lambda = 'lambda.min'),
+    list(mtry = 10, ntree = 500, formula = V101 + V102 + V103 ~.),
+    list(alpha = 0, lambda = 'lambda.min')
+    )
+
     set.seed(100)
-    var.select <- SMuRFS(formula = V1001 + V1002 + V1003 ~., data = dat, ntree = 500, mtry = 8,
-    alpha = 0.05, prop.test = .632, response.position = c(1001,1002,1003))
+    MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position = 101:103)
 
 ################################################################
 ################################################################
