@@ -1,4 +1,4 @@
-<code>
+
 
 MV.Stacker <- function(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 require(caret)
@@ -101,7 +101,7 @@ fn <- function(theta, dat, preds, my.covariance){
   my.fn <- do.call(sum, my.mahal.list)
   return(my.fn)
 }
-
+## Gradient Under Construction
 #grad <- function(theta, dat, preds, my.covariances){
 #theta[length(theta)+1] <- 1-sum(theta)
 # dat <- as.matrix(dat)
@@ -123,6 +123,8 @@ fn <- function(theta, dat, preds, my.covariance){
 #  list(avg.preds = unname(weighted.sum.preds[i,]), dat = unname(dat[i,]), covs = unname(my.covariance[[i]]), preds = unname(reorder.preds[[i]]))
 #  }
 #  )
+
+
 #my.grad.list <- lapply(total.list, function(x){
 #                 -2 * t(x$preds) %*% solve(x$covs, (x$dat - x$avg.preds))
 #}
@@ -147,4 +149,3 @@ weighted.fits[[i]] <- weights[i] * my.test.fits[[i]]
 weighted.sum.fits <- Reduce('+', weighted.fits)
 return(list(preds = weighted.sum.fits, coef = weights))
 }
-</code>
