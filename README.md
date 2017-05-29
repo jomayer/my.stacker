@@ -1,9 +1,4 @@
 # MV Stacker
-<head>
-    <script type="text/javascript"
-            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
-</head>
 
 <h1> A multivariate Stacking Algorithm </h1>
 
