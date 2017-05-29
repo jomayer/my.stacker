@@ -34,7 +34,7 @@ MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 <strong> response.position: </strong> A vector of integers detailing which columns the response is located in the dataframe.
 
 
-<h2> Details </h2> The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is <math> &sum;_{i=1}^n w;_i f;_i(x) </math>
+<h2> Details </h2> The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is <math> &sum;_i=1_^n^ w_i_ f_i_(x) </math>
 
 <h2> Value </h2> A list of survived covariates.
 
