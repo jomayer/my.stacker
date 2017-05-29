@@ -1,4 +1,9 @@
 # MV Stacker
+<head>
+    <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+</head>
 
 <h1> A multivariate Stacking Algorithm </h1>
 
@@ -36,12 +41,6 @@ MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 
 
 <h2> Details </h2> 
-
-<head>
-    <script type="text/javascript"
-            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
-</head>
 
 The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is $\sum_{i=1}^n w_i f_i(x)$. The $w_i$'s are obtained using 
 
