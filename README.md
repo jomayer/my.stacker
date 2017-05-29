@@ -1,5 +1,8 @@
 # MV Stacker
 <h1> A multivariate Stacking Algorithm </h1>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
 
 <b> Date: </b> 5/29/2017
 
