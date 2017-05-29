@@ -37,9 +37,11 @@ MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 
 <h2> Details </h2> The following function is a multivariate stacking function to stack multiple multivariate models for prediction. The resulting model is $\sum_{i=1}^n w_i f_i(x)$. The $w_i$'s are obtained using 
 
-$$\underset{\arg\min}{w\in[0,1]^m; \sum w_j = 1}\sum_{i=1}^n (y_i - \sum w_i f_i(x))^Top\Omega^{-1} (y_i - \sum w_i f_i(x)) $$
+$$\underset{\arg\min}{w\in[0,1]^m; \sum w_j = 1}\sum_{i=1}^n (y_i - \sum w_j \hat{f}_j^(x))^\top\Omega^{-1} (y_i - \sum w_j \hat{f}_j(x)) $$
 
-<h2> Value </h2> A list of survived covariates.
+Where each $\hat{f}_i(x)$ is the prediction obtained from from $k$th cross validated sample. The algorithm used in this case is downhill simplex, but BFGS is in production.
+
+<h2> Value </h2> A list containing the weights of each model and it's associated test predictions. 
 
 <h2> Examples </h2> 
 
