@@ -109,7 +109,7 @@ Where each $\hat{f}_i^k(x)$ is the prediction obtained from from $k$th cross val
      lambdas <- c(seq(0, cvcv$'lambda.min', by = 0.2), cvcv$'lambda.min')
      my.enet <- glmnet(x = xx.val, y = yy.val, family = 'mgaussian',
          alpha = vars$alpha, intercept = FALSE, lambda = lambdas)
-     preds <- predict(my.enet, newx = xx.test, s = cvcv$vars$lambda)[,,1]
+     preds <- predict(my.enet, newx = xx.test, s = cvcv$'lambda.min')[,,1]
      return(preds)
      }
 
