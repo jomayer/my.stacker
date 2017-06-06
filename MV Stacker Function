@@ -8,21 +8,38 @@ require(caret)
 ### nfold = number of folds for stacking
 ### response.position = column number for responses
 ### covar = supplied cov matrix for responses
+### prop.val.size = proportion of training data alloted to 
+### a validation set. If val.size = 0, no val set is created
 
 
 ### create cross validation of training set
+
 my.flds <- createFolds(1:nrow(dat$train), k = nfold, returnTrain = FALSE)
 dat.stack <- list()
+### If val.size = 0 no val set is created
+if(prop.val.size == 0){
 for(i in 1:nfold){
 dat.stack[[i]] <- list(train = dat$train[-my.flds[[i]],],
                        test = dat$train[my.flds[[i]],])
+}
+}
+
+else {
+for(i in 1:nfold){
+nottest.flds <- c(1:nrow(dat$train))[!1:nrow(dat$train) %in% my.flds[[i]]]
+val.flds <- sample(nottest.flds, prop.val.size * length(nottest.flds)) 
+train.flds <- nottest.flds[!nottest.flds %in% val.flds]
+dat.stack[[i]] <- list(train = dat$train[train.flds,],
+                       val = dat$train[val.flds,],
+                       test = dat$train[my.flds[[i]],])
+}
 }
 
 
 ### create a list of function and additional arguments of each function
 list.mods <- list()
-for(i in 1:length(fit.mods)){
-list.mods[[i]] <- list(fit = fit.mods[[i]],  vars = vars[[i]])
+for(i in 1:length(val.mods)){
+list.mods[[i]] <- list(fit = val.mods[[i]],  vars = vars[[i]])
 }
 
 ### fit the each function to each training fold and produce predictions
@@ -101,7 +118,7 @@ fn <- function(theta, dat, preds, my.covariance){
   my.fn <- do.call(sum, my.mahal.list)
   return(my.fn)
 }
-## Gradient Under Construction
+## grad under contstruction
 #grad <- function(theta, dat, preds, my.covariances){
 #theta[length(theta)+1] <- 1-sum(theta)
 # dat <- as.matrix(dat)
@@ -123,8 +140,6 @@ fn <- function(theta, dat, preds, my.covariance){
 #  list(avg.preds = unname(weighted.sum.preds[i,]), dat = unname(dat[i,]), covs = unname(my.covariance[[i]]), preds = unname(reorder.preds[[i]]))
 #  }
 #  )
-
-
 #my.grad.list <- lapply(total.list, function(x){
 #                 -2 * t(x$preds) %*% solve(x$covs, (x$dat - x$avg.preds))
 #}
@@ -141,6 +156,10 @@ return(my.wi)
 }             
 
 weights <- coef.fun(my.responses, my.preds, my.covariance)
+list.mods <- list()
+for(i in 1:length(val.mods)){
+list.mods[[i]] <- list(fit = fit.mods[[i]],  vars = vars[[i]])
+}
 my.test.fits <- lapply(list.mods, function(fits) fits$fit(dat, fits$vars))
 weighted.fits <- list()
 for(i in 1:length(my.test.fits)){
@@ -149,3 +168,5 @@ weighted.fits[[i]] <- weights[i] * my.test.fits[[i]]
 weighted.sum.fits <- Reduce('+', weighted.fits)
 return(list(preds = weighted.sum.fits, coef = weights))
 }
+
+
