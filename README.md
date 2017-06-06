@@ -94,9 +94,38 @@ Where each $\hat{f}_i^k(x)$ is the prediction obtained from from $k$th cross val
     return(preds)
      }
 
+    ## create val functions 
+    
+    
+
+    my.enet.val <- function(dat, vars){
+    xx.train <- as.matrix(dat$train[, 1:100])
+    xx.val <- as.matrix(dat$val[, 1:100])
+    xx.test <- as.matrix(dat$test[, 1:100])
+    yy.train <- as.matrix(dat$train[, 101:103])
+    yy.val <- as.matrix(dat$val[,101:103])
+    cvcv <- cv.glmnet(x = xx.train, y = yy.train, family = 'mgaussian',
+             alpha = vars$alpha, intercept = FALSE)
+     lambdas <- c(seq(0, cvcv$vars$lambda, by = 0.2), cvcv$vars$lambda)
+     my.enet <- glmnet(x = xx.val, y = yy.val, family = 'mgaussian',
+         alpha = vars$alpha, intercept = FALSE, lambda = lambdas)
+     preds <- predict(my.enet, newx = xx.test, s = cvcv$vars$lambda)[,,1]
+     return(preds)
+     }
+
+    my.rf.val <- function(dat, vars){
+    my.forest <- cforest(vars$formula, 
+           data = dat$val,
+           control = cforest_unbiased(ntree = vars$ntree, mtry = vars$mtry ))
+    preds <- predict(my.forest, dat$test, OOB = T)
+    preds <- do.call(rbind, preds)
+    return(preds)
+     }
 
 
     fit.mods <- list(my.enet, my.rf, my.enet)
+    
+    val.mods <- list(my.enet.val, my.rf.val, my.enet.val)
 
     vars <- list(
     list(alpha = 0.2, lambda = 'lambda.min'),
@@ -105,7 +134,7 @@ Where each $\hat{f}_i^k(x)$ is the prediction obtained from from $k$th cross val
     )
 
     set.seed(100)
-    MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position = 101:103)
+    MV.Stacker(fit.mods, val.mods, dat, vars, covar = NULL, nfold = 5, prop.val.size = 0.2, response.position = 101:103)
 
 ################################################################
 ################################################################
