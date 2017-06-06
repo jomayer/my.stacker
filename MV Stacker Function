@@ -43,7 +43,7 @@ list.mods <- list()
 ### keep val.mods = NULL
 if(is.null(val.mods)){
 for(i in 1:length(fit.mods)){
-list.mods[[i]] <- list(fit = val.mods[[i]],  vars = vars[[i]])
+list.mods[[i]] <- list(fit = fit.mods[[i]],  vars = vars[[i]])
 }
 }
 
