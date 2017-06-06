@@ -1,6 +1,6 @@
 
 
-MV.Stacker <- function(fit.mods, val.mods, dat, vars, covar = NULL, nfold = 5, prop.val.size = 0, response.position){
+MV.Stacker <- function(fit.mods, val.mods = NULL, dat, vars, covar = NULL, nfold = 5, prop.val.size = 0, response.position){
 
 require(caret)
 ### dat is a list of a data with one arg being train and the other being test
@@ -39,8 +39,18 @@ dat.stack[[i]] <- list(train = dat$train[train.flds,],
 
 ### create a list of function and additional arguments of each function
 list.mods <- list()
+### If you are not using validation set,
+### keep val.mods = NULL
+if(is.null(val.mods)){
+for(i in 1:length(fit.mods)){
+list.mods[[i]] <- list(fit = val.mods[[i]],  vars = vars[[i]])
+}
+}
+
+else{
 for(i in 1:length(val.mods)){
 list.mods[[i]] <- list(fit = val.mods[[i]],  vars = vars[[i]])
+}
 }
 
 ### fit the each function to each training fold and produce predictions
@@ -158,7 +168,7 @@ return(my.wi)
 
 weights <- coef.fun(my.responses, my.preds, my.covariance)
 list.mods <- list()
-for(i in 1:length(val.mods)){
+for(i in 1:length(fit.mods)){
 list.mods[[i]] <- list(fit = fit.mods[[i]],  vars = vars[[i]])
 }
 my.test.fits <- lapply(list.mods, function(fits) fits$fit(dat, fits$vars))
