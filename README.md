@@ -18,12 +18,14 @@
 <h2> Usage </h2>
 
 <code>
-MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
+MV.Stacker(fit.mods, val.mods, dat, vars, covar = NULL, nfold = 5, prop.val.size = 0, response.position)
 </code>
 
 <b> Inputs </b>
 
-<strong> fit.mods: </strong> A list of functions to be stacked. The functions must be of the form <code> fun(dat, vars) </code> and the output of those functions must be test predictions.
+<strong> fit.mods: </strong> A list of functions to be stacked. The functions must be of the form <code> fun(dat, vars) </code> and the output of those functions must be test predictions. dat must be a list with names train and test.
+
+<strong> val.mods: </strong> A list of functions to be stacked. The functions must be of the form <code> fun(dat, vars) </code> and the output of those functions must be test predictions. dat must be a list with names train, val, and test.
 
 <strong> dat: </strong> A list of dataframes consisting of an entry in the list labeled <i> test </i> and <i> train </i>
 
@@ -32,6 +34,8 @@ MV.Stacker(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
 <strong> covar: </strong> An optional list of covariance matricies of <code> length </code> equal to <code>nrow(dat$train) </code>  to use in the stacking algorithm. The default is to use <code> cov(dat$train) </code>
 
 <strong> nfold: </strong> The number of folds used in stacking. The default is 5.
+
+<strong> prop.val.size: </strong> A number between 0 and 1 to represent the proportion of the training data used in validation.
 
 <strong> response.position: </strong> A vector of integers detailing which columns the response is located in the dataframe.
 
