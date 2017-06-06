@@ -1,6 +1,7 @@
 
 
-MV.Stacker <- function(fit.mods, dat, vars, covar = NULL, nfold = 5, response.position){
+MV.Stacker <- function(fit.mods, val.mods, dat, vars, covar = NULL, nfold = 5, prop.val.size = 0, response.position){
+
 require(caret)
 ### dat is a list of a data with one arg being train and the other being test
 ### fit.mods = a list of funs whose args are dat and vars
